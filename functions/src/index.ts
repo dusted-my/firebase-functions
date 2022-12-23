@@ -1,4 +1,4 @@
 import * as admin from "firebase-admin";
 admin.initializeApp();
 
-export * from "./onCreateUser";
+export * from "./triggers/onCreateUser";

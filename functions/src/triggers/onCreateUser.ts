@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { User } from "./types";
+import { User } from "../types";
 
 export const onCreateUser = functions.auth.user().onCreate(async (user) => {
   const { displayName, email, photoURL } = user;
