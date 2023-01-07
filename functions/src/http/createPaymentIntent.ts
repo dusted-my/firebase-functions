@@ -5,13 +5,13 @@ const stripeSecret = process.env.STRIPE_SECRET || "";
 const httpsError = functions.https.HttpsError;
 const stripe = new Stripe(stripeSecret, { apiVersion: "2022-11-15" });
 
-export const createPaymentIntent = functions.https.onRequest(
-  async (req, res) => {
-    if (req.method !== "POST") {
-      throw new httpsError("permission-denied", "Method Not Allowed").toJSON();
+export const createPaymentIntent = functions.https.onCall(
+  async (data, context) => {
+    if (!context.auth?.token) {
+      throw new httpsError("unauthenticated", "Unauthenticated").toJSON();
     }
 
-    const { amount, contractId } = req.body;
+    const { amount, contractId } = data;
     if (!amount) {
       throw new httpsError("invalid-argument", "Amount is Required").toJSON();
     }
@@ -32,7 +32,7 @@ export const createPaymentIntent = functions.https.onRequest(
         },
       });
 
-      res.status(201).json({ clientSecret: paymentIntent.client_secret });
+      return { clientSecret: paymentIntent.client_secret };
     } catch (e: any) {
       throw new httpsError(
         "cancelled",
