@@ -6,3 +6,4 @@ admin.initializeApp();
 
 export * from "./triggers/onCreateUser";
 export * from "./http/stripeWebHooks";
+export * from "./http/createPaymentIntent";
