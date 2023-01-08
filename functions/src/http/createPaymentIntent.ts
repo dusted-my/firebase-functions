@@ -26,7 +26,7 @@ export const createPaymentIntent = functions.https.onCall(
       const paymentIntent = await stripe.paymentIntents.create({
         amount,
         currency: "myr",
-        payment_method_types: ["card", "fpx"],
+        payment_method_types: ["card", "grabpay"],
         metadata: {
           contractId,
         },

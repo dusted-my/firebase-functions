@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
 import Stripe from "stripe";
 
 const stripeSecret = process.env.STRIPE_SECRET || "";
@@ -32,14 +33,25 @@ export const stripeWebHooks = functions.https.onRequest(async (req, res) => {
   switch (event.type) {
     case "payment_intent.succeeded":
       const paymentIntent: any = event.data.object;
-      // const contractId: string = paymentIntent.metadata.contract_id;
-      // if (!contractId) {
-      //   throw new httpsError(
-      //     "invalid-argument",
-      //     "Contract ID is Required in metadata"
-      //   )
-      // }
-      functions.logger.debug(paymentIntent);
+      const contractId: string = paymentIntent.metadata.contractId;
+      if (!contractId) {
+        throw new httpsError(
+          "invalid-argument",
+          "Contract ID is Required in metadata"
+        );
+      }
+
+      try {
+        await admin
+          .firestore()
+          .doc(`contracts/${contractId}`)
+          .update({ status: "client_submitted" });
+      } catch (e: any) {
+        throw new httpsError(
+          "aborted",
+          e.message || "Unable to update contract"
+        );
+      }
       break;
     default:
       throw new httpsError(
